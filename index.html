@@ -128,7 +128,8 @@
   .entete { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 36px; }
   .entete a { font-weight: 700; }
   .restos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; }
-  .resto { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--texte); }
+  .resto { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--texte);
+    background: none; border: 0; padding: 0; font: inherit; text-align: left; cursor: pointer; }
   .resto:hover { color: var(--texte); }
   .resto-photo { aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; background: var(--orange-clair); }
   .resto-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
@@ -141,6 +142,33 @@
     .restos { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-right: -20px; padding-right: 20px; padding-bottom: 6px; }
     .resto { flex: 0 0 220px; scroll-snap-align: start; }
   }
+
+
+  /* ============ Fenêtre du menu d'un restaurant ============ */
+  dialog.menu-resto {
+    width: min(640px, calc(100vw - 24px)); max-height: calc(100vh - 48px);
+    padding: 0; border: 0; border-radius: 32px; background: var(--fond); color: var(--texte);
+    box-shadow: 0 30px 60px -20px rgba(32, 32, 30, .45); overflow: hidden;
+  }
+  dialog.menu-resto::backdrop { background: rgba(32, 32, 30, .55); }
+  .menu-contenu { max-height: calc(100vh - 48px); overflow-y: auto; }
+  .menu-photo { height: 220px; background: var(--orange-clair); position: relative; }
+  .menu-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .fermer {
+    position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%;
+    border: 0; background: var(--blanc); cursor: pointer; display: grid; place-items: center;
+  }
+  .menu-corps { padding: 26px 28px 30px; }
+  .menu-corps h3 { margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; }
+  .menu-quartier { color: var(--texte-2); margin: 4px 0 0; }
+  .menu-description { color: var(--texte-doux); margin: 14px 0 0; }
+  .menu-corps h4 { margin: 26px 0 8px; font-size: 1.05rem; font-weight: 800; color: var(--orange-texte); }
+  .plat { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--bordure); }
+  .plat strong { display: block; font-weight: 700; }
+  .plat small { display: block; color: var(--texte-2); font-size: .9rem; margin-top: 2px; }
+  .plat .prix { font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .menu-attente { color: var(--texte-2); margin: 24px 0 0; }
+  .menu-corps .btn { width: 100%; margin-top: 26px; }
 
   /* ============ Qui reçoit quoi ============ */
   .repartition h2 { text-align: center; }
@@ -362,6 +390,24 @@
 
 </main>
 
+<!-- ===== Fenêtre : menu d'un restaurant ===== -->
+<dialog class="menu-resto" id="menu-resto" aria-labelledby="menu-nom">
+  <div class="menu-contenu">
+    <div class="menu-photo" id="menu-photo">
+      <button class="fermer" id="menu-fermer" aria-label="Fermer le menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#20201E" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="menu-corps">
+      <h3 id="menu-nom"></h3>
+      <p class="menu-quartier" id="menu-quartier"></p>
+      <p class="menu-description" id="menu-description"></p>
+      <div id="menu-plats"></div>
+      <a class="btn btn-orange btn-grand" data-lien="appli" href="#">Commander dans l'appli</a>
+    </div>
+  </div>
+</dialog>
+
 <footer>
   <div class="wrap">
     <div class="pied">
@@ -405,8 +451,8 @@
   // RÉGLAGES : les 3 seules lignes à remplir / modifier
   // =====================================================================
   const APPLI = 'https://foodupsolution.onrender.com';   // adresse de l'application
-  const AIRTABLE_BASE = 'appnLn9BMS3IQsu4B';             // identifiant de la base (commence par "app")
-  const AIRTABLE_JETON = 'patDJb0gkiIl1SKbF.413eab40ed281e6427e807d5855c8accf05956ebf1649964b6f18766c39ae032';            // jeton en lecture seule (commence par "pat")
+  const AIRTABLE_BASE = 'appXXXXXXXXXXXXXX';             // identifiant de la base (commence par "app")
+  const AIRTABLE_JETON = 'patXXXXXXXXXXXXXX';            // jeton en lecture seule (commence par "pat")
 
   // Liens vers l'appli. Les boutons d'inscription ouvrent directement
   // la fenêtre de création de compte avec le bon profil.
@@ -438,13 +484,20 @@
   }
 
   const liste = document.getElementById('restos-liste');
+  const fenetre = document.getElementById('menu-resto');
+  const euros = n => Number(n || 0).toFixed(2).replace('.', ',') + ' €';
+  let restos = [];
+  let tousLesPlats = null; // chargés une seule fois, au premier clic sur un resto
 
   lireTable('Restaurants')
     .then(lignes => {
-      const restos = lignes
+      restos = lignes
         .map(rec => ({
+          rec: rec.id,                                  // identifiant Airtable (rec…)
+          id: rec.fields.restaurant_id || rec.id,       // identifiant FoodUp (RST-…)
           nom: rec.fields.nom_restaurant || '',
           quartier: rec.fields.quartier || '',
+          description: rec.fields.description || rec.fields.accroche || '',
           photo: photoValide(rec.fields.image_url),
           ouvert: oui(rec.fields.disponible_commandes),
         }))
@@ -452,12 +505,12 @@
 
       if (!restos.length) throw new Error('Aucun restaurant');
 
-      liste.innerHTML = restos.map(r => `
-        <a class="resto" href="${LIENS.appli}">
-          <div class="resto-photo">${r.photo ? `<img src="${txt(r.photo)}" alt="${txt(r.nom)}" loading="lazy" onerror="this.remove()">` : ''}</div>
+      liste.innerHTML = restos.map((r, i) => `
+        <button type="button" class="resto" data-index="${i}" aria-haspopup="dialog">
+          <div class="resto-photo">${r.photo ? `<img src="${txt(r.photo)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
           <strong>${txt(r.nom)}</strong>
           ${r.quartier ? `<span>${txt(r.quartier)}</span>` : ''}
-        </a>`).join('');
+        </button>`).join('');
 
       // Les 3 premières photos remplissent les ronds de l'accueil
       const ronds = document.querySelectorAll('.photos .rond');
@@ -468,6 +521,53 @@
     .catch(() => {
       liste.innerHTML = `<div class="etat">Les restos s'affichent dans l'application.<br><a class="btn btn-orange" href="${LIENS.appli}">Voir les restos</a></div>`;
     });
+
+  // Clic sur un resto : ouvre la fenêtre avec son menu
+  liste.addEventListener('click', e => {
+    const carte = e.target.closest('.resto');
+    if (carte) ouvrirMenu(restos[carte.dataset.index]);
+  });
+
+  async function ouvrirMenu(r) {
+    document.getElementById('menu-photo').querySelector('img')?.remove();
+    if (r.photo) document.getElementById('menu-photo').insertAdjacentHTML('afterbegin', `<img src="${txt(r.photo)}" alt="" onerror="this.remove()">`);
+    document.getElementById('menu-nom').textContent = r.nom;
+    document.getElementById('menu-quartier').textContent = r.quartier;
+    document.getElementById('menu-description').textContent = r.description;
+    const zone = document.getElementById('menu-plats');
+    zone.innerHTML = '<p class="menu-attente">Chargement du menu…</p>';
+    fenetre.showModal();
+
+    try {
+      tousLesPlats ||= await lireTable('Plats');
+      // Le lien plat → restaurant peut être un lien Airtable (rec…) ou un identifiant texte (RST-…)
+      const plats = tousLesPlats.filter(p => {
+        const lien = p.fields.restaurant_id;
+        const liens = Array.isArray(lien) ? lien : [lien];
+        return (liens.includes(r.rec) || liens.includes(r.id)) && oui(p.fields.disponible);
+      });
+      if (!plats.length) { zone.innerHTML = '<p class="menu-attente">Le menu arrive bientôt.</p>'; return; }
+
+      const ordre = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
+      const rang = c => { const i = ordre.indexOf(c); return i < 0 ? 99 : i; };
+      const parCategorie = {};
+      plats.forEach(p => { const c = p.fields.categorie || 'Plats'; (parCategorie[c] ||= []).push(p.fields); });
+
+      zone.innerHTML = Object.keys(parCategorie).sort((a, b) => rang(a) - rang(b)).map(c =>
+        `<h4>${txt(c)}</h4>` + parCategorie[c].map(p => `
+          <div class="plat">
+            <div><strong>${txt(p.nom_plat)}</strong>${p.description ? `<small>${txt(p.description)}</small>` : ''}</div>
+            <span class="prix">${euros(p.prix)}</span>
+          </div>`).join('')
+      ).join('');
+    } catch {
+      zone.innerHTML = '<p class="menu-attente">Le menu ne peut pas s\'afficher ici. Retrouvez-le dans l\'appli.</p>';
+    }
+  }
+
+  // Fermeture : bouton, touche Échap (gérée par le navigateur) ou clic à côté
+  document.getElementById('menu-fermer').addEventListener('click', () => fenetre.close());
+  fenetre.addEventListener('click', e => { if (e.target === fenetre) fenetre.close(); });
 </script>
 </body>
 </html>
