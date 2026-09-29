@@ -133,3 +133,10 @@ async function ouvrirMenu(r) {
 // Fermeture : bouton, touche Échap (gérée par le navigateur) ou clic à côté
 document.getElementById('menu-fermer').addEventListener('click', () => fenetre.close());
 fenetre.addEventListener('click', e => { if (e.target === fenetre) fenetre.close(); });
+
+// FAQ : une seule question ouverte à la fois
+document.querySelectorAll('details[name="faq"]').forEach(q => {
+  q.addEventListener('toggle', () => {
+    if (q.open) document.querySelectorAll('details[name="faq"]').forEach(autre => { if (autre !== q) autre.open = false; });
+  });
+});
