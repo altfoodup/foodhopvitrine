@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FoodUp — Le bon petit resto du coin, livré chez vous</title>
+<meta name="description" content="FoodUp livre les plats des restaurants indépendants de votre quartier. Un prix clair, un livreur bien payé.">
+<meta property="og:title" content="FoodUp — Le bon petit resto du coin, livré chez vous">
+<meta property="og:description" content="Des plats faits maison, un prix clair, un livreur bien payé.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='7' fill='%23F26A00'/><path d='M5 11.5h14a7 7 0 0 1-14 0z' fill='none' stroke='white' stroke-width='2'/></svg>">
+<style>
+  /* ============ Charte FoodUp (identique à l'application) ============ */
+  :root {
+    --orange: #F26A00;
+    --orange-fonce: #C94F00;   /* boutons */
+    --orange-texte: #9E3E00;   /* liens, survol */
+    --orange-clair: #FFF1E5;
+    --vert: #138A63;
+    --vert-fonce: #0F6E4F;
+    --vert-clair: #E7F4EE;
+    --fond: #FFFCF8;
+    --gris-clair: #F5F2EC;
+    --bordure: #E8E5DF;
+    --texte: #20201E;
+    --texte-doux: #45453F;
+    --texte-2: #6B6B66;
+    --nuit: #20201E;
+    --nuit-2: #2E2E2B;
+    --blanc: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--fond);
+    color: var(--texte);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  ::selection { background: var(--orange-clair); color: var(--orange-texte); }
+  img { max-width: 100%; display: block; }
+  a { color: var(--orange-texte); }
+  a:hover { color: var(--orange-fonce); }
+  :focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; border-radius: 8px; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+  h1, h2 { margin: 0; font-weight: 900; letter-spacing: -0.035em; line-height: 1.05; }
+  h2 { font-size: clamp(2rem, 4vw, 3rem); }
+  section { padding-top: 110px; }
+
+  /* ============ Boutons ============ */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    text-decoration: none; font-weight: 700; border-radius: 999px;
+    padding: 14px 24px; font-size: 1rem; transition: background-color .15s;
+  }
+  .btn-orange { background: var(--orange-fonce); color: var(--blanc); }
+  .btn-orange:hover { background: var(--orange-texte); color: var(--blanc); }
+  .btn-blanc { background: var(--blanc); color: var(--texte); }
+  .btn-blanc:hover { color: var(--orange-texte); }
+  .btn-grand { padding: 20px 34px; font-size: 1.12rem; font-weight: 800; }
+
+  /* ============ En-tête ============ */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: rgba(255, 252, 248, .94);
+    backdrop-filter: blur(8px);
+  }
+  .barre { height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--texte); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+  .logo:hover { color: var(--texte); }
+  .logo-icone { width: 44px; height: 44px; border-radius: 14px; background: var(--orange); display: grid; place-items: center; flex-shrink: 0; }
+  .menu { display: flex; align-items: center; gap: 34px; }
+  .menu a:not(.btn) { text-decoration: none; color: var(--texte-doux); font-weight: 600; }
+  .menu a:not(.btn):hover { color: var(--orange-texte); }
+  @media (max-width: 760px) {
+    .menu a:not(.btn) { display: none; }
+    .barre { height: 72px; }
+    .logo { font-size: 1.3rem; }
+    .logo-icone { width: 38px; height: 38px; border-radius: 12px; }
+  }
+
+  /* ============ Accueil ============ */
+  .accueil {
+    margin: 8px 20px 0; border-radius: 40px; background: var(--orange-clair);
+    overflow: hidden;
+  }
+  .accueil-grille { display: grid; grid-template-columns: 1fr 520px; align-items: center; gap: 40px; min-height: 620px; padding-top: 40px; padding-bottom: 40px; }
+  .accueil h1 { font-size: clamp(2.7rem, 6vw, 4.8rem); letter-spacing: -0.045em; max-width: 12ch; }
+  .accueil p { font-size: 1.3rem; color: var(--texte-doux); margin: 26px 0 0; max-width: 30ch; }
+  .accueil .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+
+  .photos { position: relative; height: 540px; }
+  .rond { position: absolute; border-radius: 50%; border: 10px solid var(--blanc); overflow: hidden; background: #F8D9BF; }
+  .rond img { width: 100%; height: 100%; object-fit: cover; }
+  .rond.a { width: 400px; height: 400px; left: 30px; top: 50px; }
+  .rond.b { width: 210px; height: 210px; left: 320px; top: 320px; border-width: 8px; }
+  .rond.c { width: 160px; height: 160px; left: 360px; top: 0; border-width: 8px; }
+  .bulle {
+    position: absolute; left: 0; top: 410px; background: var(--blanc); border-radius: 20px;
+    padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 14px 30px -14px rgba(158, 62, 0, .4);
+  }
+  .bulle-icone { width: 40px; height: 40px; border-radius: 12px; background: var(--vert-clair); display: grid; place-items: center; }
+  .bulle strong { display: block; font-size: .95rem; }
+  .bulle span { font-size: .9rem; color: var(--texte-2); }
+
+  @media (max-width: 1000px) {
+    .accueil { margin: 4px 12px 0; border-radius: 32px; }
+    .accueil-grille { grid-template-columns: 1fr; min-height: 0; gap: 10px; padding-top: 36px; }
+    .accueil .wrap, .accueil-grille { padding-left: 22px; padding-right: 22px; }
+    .accueil p { font-size: 1.1rem; }
+    .photos { height: 300px; max-width: 380px; }
+    .rond.a { width: 250px; height: 250px; left: 10px; top: 20px; border-width: 7px; }
+    .rond.b { width: 130px; height: 130px; left: 210px; top: 150px; border-width: 6px; }
+    .rond.c { display: none; }
+    .bulle { top: 220px; padding: 10px 14px; }
+    .accueil .actions { order: 3; }
+    .btn-grand { width: 100%; }
+  }
+
+  /* ============ Restaurants ============ */
+  .entete { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 36px; }
+  .entete a { font-weight: 700; }
+  .restos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; }
+  .resto { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--texte); }
+  .resto:hover { color: var(--texte); }
+  .resto-photo { aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; background: var(--orange-clair); }
+  .resto-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+  .resto:hover .resto-photo img { transform: scale(1.04); }
+  .resto strong { font-size: 1.15rem; font-weight: 800; padding: 0 6px; }
+  .resto span { font-size: .95rem; color: var(--texte-2); padding: 0 6px; margin-top: -8px; }
+  .etat { grid-column: 1 / -1; background: var(--blanc); border: 1px dashed var(--bordure); border-radius: 28px; padding: 40px; text-align: center; color: var(--texte-2); }
+  .etat .btn { margin-top: 16px; }
+  @media (max-width: 760px) {
+    .restos { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-right: -20px; padding-right: 20px; padding-bottom: 6px; }
+    .resto { flex: 0 0 220px; scroll-snap-align: start; }
+  }
+
+  /* ============ Qui reçoit quoi ============ */
+  .repartition h2 { text-align: center; }
+  .trois { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 44px; }
+  .part { border-radius: 32px; padding: 40px; display: flex; flex-direction: column; gap: 16px; }
+  .part.o { background: var(--orange-clair); }
+  .part.v { background: var(--vert-clair); }
+  .part.g { background: var(--gris-clair); }
+  .part-icone { width: 64px; height: 64px; border-radius: 20px; background: var(--blanc); display: grid; place-items: center; }
+  .part strong { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
+  .part span { font-size: 1.12rem; color: var(--texte-doux); margin-top: -8px; }
+  .precision { text-align: center; color: var(--texte-2); margin: 26px 0 0; }
+  @media (max-width: 900px) {
+    .repartition h2 { text-align: left; }
+    .trois { grid-template-columns: 1fr; gap: 14px; margin-top: 28px; }
+    .part { flex-direction: row; align-items: center; padding: 22px; border-radius: 26px; flex-wrap: wrap; column-gap: 16px; row-gap: 2px; }
+    .part-icone { width: 52px; height: 52px; border-radius: 16px; }
+    .part div { display: flex; flex-direction: column; }
+    .part strong { font-size: 1.2rem; }
+    .part span { font-size: 1rem; margin-top: 0; }
+    .precision { text-align: left; }
+  }
+
+  /* ============ Rejoindre ============ */
+  .rejoindre { margin: 110px 20px 0; border-radius: 40px; background: var(--nuit); color: var(--blanc); padding: 90px 0; }
+  .profils { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 44px; }
+  .profil { background: var(--nuit-2); border-radius: 32px; padding: 36px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+  .profil strong { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; }
+  .profil span { font-size: 1.06rem; color: #D6D2CA; }
+  .profil .btn { margin-top: auto; }
+  @media (max-width: 900px) {
+    .rejoindre { margin: 80px 12px 0; border-radius: 32px; padding: 48px 0; }
+    .rejoindre .wrap { padding: 0 20px; }
+    .profils { grid-template-columns: 1fr; gap: 14px; margin-top: 28px; }
+    .profil { padding: 26px; border-radius: 24px; }
+    .profil strong { font-size: 1.45rem; }
+  }
+
+  /* ============ FAQ ============ */
+  .faq-liste { max-width: 820px; margin-top: 36px; display: grid; gap: 12px; }
+  details { background: var(--blanc); border: 1px solid var(--bordure); border-radius: 22px; }
+  details[open] { border-color: #F8D9BF; background: #FFF8EE; }
+  summary { cursor: pointer; list-style: none; padding: 22px 64px 22px 26px; font-weight: 700; font-size: 1.08rem; position: relative; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+"; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    width: 32px; height: 32px; border-radius: 50%; background: var(--orange-clair); color: var(--orange-texte);
+    display: grid; place-items: center; font-size: 1.3rem; font-weight: 600;
+  }
+  details[open] summary::after { content: "–"; }
+  details p { margin: 0; padding: 0 26px 24px; color: var(--texte-doux); max-width: 68ch; }
+
+  /* ============ Pied de page ============ */
+  footer { margin-top: 110px; border-top: 1px solid var(--bordure); padding: 56px 0 calc(40px + env(safe-area-inset-bottom, 0px)); }
+  .pied { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 40px; }
+  .pied p { color: var(--texte-2); margin: 14px 0 0; max-width: 32ch; }
+  .pied h3 { font-size: .95rem; font-weight: 800; margin: 0 0 14px; }
+  .pied ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .pied ul a { color: var(--texte-2); text-decoration: none; }
+  .pied ul a:hover { color: var(--orange-texte); }
+  .reseaux { display: flex; flex-wrap: wrap; gap: 10px; }
+  .reseaux a {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px;
+    background: var(--gris-clair); color: var(--texte); text-decoration: none; font-weight: 600; font-size: .92rem;
+  }
+  .reseaux a:hover { background: var(--orange-clair); color: var(--orange-texte); }
+  .bas { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--bordure); color: var(--texte-2); font-size: .9rem; }
+  @media (max-width: 800px) { .pied { grid-template-columns: 1fr; gap: 32px; } }
+
+  @media (max-width: 760px) {
+    .wrap { padding: 0 20px; }
+    section { padding-top: 72px; }
+    footer { margin-top: 80px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap barre">
+    <a href="#" class="logo" aria-label="FoodUp, retour en haut">
+      <span class="logo-icone" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 7c0-1.5 1-2 1-3.5"/><path d="M14 7c0-1.5 1-2 1-3.5"/></svg>
+      </span>
+      FoodUp
+    </a>
+    <nav class="menu" aria-label="Navigation principale">
+      <a href="#restos">Les restos</a>
+      <a href="#rejoindre">Nous rejoindre</a>
+      <a href="#faq">Questions</a>
+      <a class="btn btn-orange" data-lien="appli" href="#">Commander</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== Accueil ===== -->
+  <div class="accueil">
+    <div class="wrap accueil-grille">
+      <div>
+        <h1>Le bon petit resto du coin, livré chez vous.</h1>
+        <p>Des plats faits maison, un prix clair, un livreur bien payé.</p>
+        <div class="actions">
+          <a class="btn btn-orange btn-grand" data-lien="appli" href="#">J'ai faim, je commande</a>
+          <a class="btn btn-blanc btn-grand" href="#restos">Voir les restos</a>
+        </div>
+      </div>
+      <div class="photos" aria-hidden="true">
+        <div class="rond a"></div>
+        <div class="rond b"></div>
+        <div class="rond c"></div>
+        <div class="bulle">
+          <div class="bulle-icone">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#138A63" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h2l3 7.5M5.5 17.5 9 9h6l3.5 8.5M9 9 7.5 5.5H5"/></svg>
+          </div>
+          <div><strong>Votre livreur arrive</strong><span>Suivi en direct</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Restaurants (lus en direct dans Airtable) ===== -->
+  <section id="restos">
+    <div class="wrap">
+      <div class="entete">
+        <h2>Près de chez vous</h2>
+        <a data-lien="appli" href="#">Tous les restos dans l'appli</a>
+      </div>
+      <div class="restos" id="restos-liste" aria-live="polite">
+        <div class="etat">Chargement des restos…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Qui reçoit quoi ===== -->
+  <section class="repartition">
+    <div class="wrap">
+      <h2>Chaque euro va au bon endroit</h2>
+      <div class="trois">
+        <div class="part o">
+          <div class="part-icone"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C94F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></div>
+          <div><strong>Le prix des plats</strong><span>va au restaurant.</span></div>
+        </div>
+        <div class="part v">
+          <div class="part-icone"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#138A63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h2l3 7.5M5.5 17.5 9 9h6l3.5 8.5M9 9 7.5 5.5H5"/></svg></div>
+          <div><strong>Toute la livraison</strong><span>va au livreur.</span></div>
+        </div>
+        <div class="part g">
+          <div class="part-icone"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#45453F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5 5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/></svg></div>
+          <div><strong>1 € de service</strong><span>fait tourner FoodUp.</span></div>
+        </div>
+      </div>
+      <p class="precision">Livraison : 5 € + 10 % du montant des plats.</p>
+    </div>
+  </section>
+
+  <!-- ===== Rejoindre ===== -->
+  <div class="rejoindre" id="rejoindre">
+    <div class="wrap">
+      <h2>Rejoignez la bande</h2>
+      <div class="profils">
+        <div class="profil">
+          <strong>J'ai faim</strong>
+          <span>Commandez en quelques clics.</span>
+          <a class="btn btn-orange" data-lien="client" href="#">Créer mon compte</a>
+        </div>
+        <div class="profil">
+          <strong>J'ai un restaurant</strong>
+          <span>Vous fixez vos prix, vous gardez le montant des plats.</span>
+          <a class="btn btn-orange" data-lien="restaurateur" href="#">Inscrire mon resto</a>
+        </div>
+        <div class="profil">
+          <strong>Je livre</strong>
+          <span>Vous touchez tous les frais de livraison.</span>
+          <a class="btn btn-orange" data-lien="livreur" href="#">Devenir livreur</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq">
+    <div class="wrap">
+      <h2>Vos questions</h2>
+      <div class="faq-liste">
+        <details>
+          <summary>Comment commander ?</summary>
+          <p>Créez votre compte client dans l'application, choisissez un restaurant, ajoutez vos plats au panier et validez. Le total, frais compris, s'affiche avant la validation.</p>
+        </details>
+        <details>
+          <summary>Quels restaurants trouve-t-on sur FoodUp ?</summary>
+          <p>Uniquement des restaurants indépendants. Chaque restaurant est validé par l'équipe FoodUp avant de pouvoir recevoir des commandes.</p>
+        </details>
+        <details>
+          <summary>Combien coûte la livraison ?</summary>
+          <p>La livraison coûte 5 € plus 10 % du montant des plats, et revient entièrement au livreur. S'y ajoute 1 € de frais de service pour FoodUp. Ces frais sont les mêmes dans tous les restaurants.</p>
+        </details>
+        <details>
+          <summary>Comment suivre ma commande ?</summary>
+          <p>Dans l'application, vous voyez chaque étape : le restaurant accepte votre commande, la prépare, le livreur la récupère puis vous la livre.</p>
+        </details>
+        <details>
+          <summary>Un problème avec ma commande ?</summary>
+          <p>Ouvrez le détail de votre commande et appuyez sur « Signaler un problème ». L'équipe FoodUp reçoit votre signalement.</p>
+        </details>
+        <details>
+          <summary>Comment inscrire mon restaurant ?</summary>
+          <p>Cliquez sur « Inscrire mon resto » et remplissez la fiche de votre établissement avec vos premiers plats. Vous fixez les prix de votre carte et vous gardez le montant des plats. Les frais de livraison et de service sont fixés par FoodUp. Votre restaurant est visible après validation par l'équipe.</p>
+        </details>
+        <details>
+          <summary>Comment devenir livreur ?</summary>
+          <p>Cliquez sur « Devenir livreur », indiquez votre zone de livraison et votre moyen de transport : vélo, vélo électrique ou scooter électrique. Une fois votre profil validé, vous voyez les courses disponibles et ce qu'elles vous rapportent.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="pied">
+      <div>
+        <a href="#" class="logo" aria-label="FoodUp, retour en haut">
+          <span class="logo-icone" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 7c0-1.5 1-2 1-3.5"/><path d="M14 7c0-1.5 1-2 1-3.5"/></svg>
+          </span>
+          FoodUp
+        </a>
+        <p>La livraison des restos indépendants de votre quartier.</p>
+      </div>
+      <div>
+        <h3>FoodUp</h3>
+        <ul>
+          <li><a href="#">L'équipe</a></li>
+          <li><a href="#">Mentions légales</a></li>
+          <li><a href="#">Confidentialité</a></li>
+          <li><a href="#">Conditions générales d'utilisation</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Suivez-nous</h3>
+        <div class="reseaux">
+          <!-- Remplacez les # par les adresses de vos comptes -->
+          <a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Instagram</a>
+          <a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 0 0-4 0"/></svg>LinkedIn</a>
+          <a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0M14 8h-1.5A1.5 1.5 0 0 0 11 9.5V21M9 13h5"/></svg>Facebook</a>
+        </div>
+      </div>
+    </div>
+    <div class="bas">
+      <span>© <span id="annee"></span> FoodUp</span>
+      <a data-lien="appli" href="#">Ouvrir l'application</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // =====================================================================
+  // RÉGLAGES : les 3 seules lignes à remplir / modifier
+  // =====================================================================
+  const APPLI = 'https://foodupsolution.onrender.com';   // adresse de l'application
+  const AIRTABLE_BASE = 'appnLn9BMS3IQsu4B';             // identifiant de la base (commence par "app")
+  const AIRTABLE_JETON = 'patDJb0gkiIl1SKbF.413eab40ed281e6427e807d5855c8accf05956ebf1649964b6f18766c39ae032';            // jeton en lecture seule (commence par "pat")
+
+  // Liens vers l'appli. Les boutons d'inscription ouvrent directement
+  // la fenêtre de création de compte avec le bon profil.
+  const LIENS = {
+    appli: APPLI,
+    client: APPLI + '/?inscription=client',
+    restaurateur: APPLI + '/?inscription=restaurateur',
+    livreur: APPLI + '/?inscription=livreur',
+  };
+  document.querySelectorAll('[data-lien]').forEach(a => { a.href = LIENS[a.dataset.lien]; });
+  document.getElementById('annee').textContent = new Date().getFullYear();
+
+  const txt = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const oui = v => v === true || v === 'Oui';
+  const photoValide = v => typeof v === 'string' && /^https?:\/\//.test(v.trim()) ? v.trim() : '';
+
+  // Lit toutes les lignes d'une table Airtable (envoyées par paquets de 100)
+  async function lireTable(table) {
+    let lignes = [], suite = '';
+    do {
+      const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(table)}?pageSize=100` + (suite ? `&offset=${suite}` : '');
+      const r = await fetch(url, { headers: { Authorization: 'Bearer ' + AIRTABLE_JETON } });
+      if (!r.ok) throw new Error('Airtable a répondu ' + r.status);
+      const d = await r.json();
+      lignes = lignes.concat(d.records || []);
+      suite = d.offset || '';
+    } while (suite);
+    return lignes;
+  }
+
+  const liste = document.getElementById('restos-liste');
+
+  lireTable('Restaurants')
+    .then(lignes => {
+      const restos = lignes
+        .map(rec => ({
+          nom: rec.fields.nom_restaurant || '',
+          quartier: rec.fields.quartier || '',
+          photo: photoValide(rec.fields.image_url),
+          ouvert: oui(rec.fields.disponible_commandes),
+        }))
+        .filter(r => r.nom && r.ouvert);
+
+      if (!restos.length) throw new Error('Aucun restaurant');
+
+      liste.innerHTML = restos.map(r => `
+        <a class="resto" href="${LIENS.appli}">
+          <div class="resto-photo">${r.photo ? `<img src="${txt(r.photo)}" alt="${txt(r.nom)}" loading="lazy" onerror="this.remove()">` : ''}</div>
+          <strong>${txt(r.nom)}</strong>
+          ${r.quartier ? `<span>${txt(r.quartier)}</span>` : ''}
+        </a>`).join('');
+
+      // Les 3 premières photos remplissent les ronds de l'accueil
+      const ronds = document.querySelectorAll('.photos .rond');
+      restos.filter(r => r.photo).slice(0, 3).forEach((r, i) => {
+        ronds[i].innerHTML = `<img src="${txt(r.photo)}" alt="" onerror="this.remove()">`;
+      });
+    })
+    .catch(() => {
+      liste.innerHTML = `<div class="etat">Les restos s'affichent dans l'application.<br><a class="btn btn-orange" href="${LIENS.appli}">Voir les restos</a></div>`;
+    });
+</script>
+</body>
+</html>
