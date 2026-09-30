@@ -65,7 +65,14 @@ if (liste) lireTable('Restaurants')
     if (!tous.length) throw new Error('Aucun restaurant');
 
     // Accueil : quelques restos au hasard (en priorité ceux qui ont une photo). Page dédiée : tous.
-    restos = nombre ? melanger(tous.filter(r => r.photo)).concat(tous.filter(r => !r.photo)).slice(0, nombre) : tous;
+    // Sur l'accueil, on évite deux restos avec la même photo (doublons possibles dans Airtable)
+    const photosDifferentes = l => {
+      const vues = new Set();
+      return l.filter(r => !r.photo || (!vues.has(r.photo) && vues.add(r.photo)));
+    };
+    restos = nombre
+      ? photosDifferentes(melanger(tous.filter(r => r.photo))).concat(tous.filter(r => !r.photo)).slice(0, nombre)
+      : tous;
 
     liste.innerHTML = restos.map((r, i) => `
       <button type="button" class="resto" data-index="${i}" aria-haspopup="dialog">
@@ -113,13 +120,22 @@ async function ouvrirMenu(r) {
     });
     if (!plats.length) { zone.innerHTML = '<p class="menu-attente">Le menu arrive bientôt.</p>'; return; }
 
-    const ordre = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
-    const rang = c => { const i = ordre.indexOf(c); return i < 0 ? 99 : i; };
+    // Ordre des catégories (identique à l'appli) : Entrées, Plats, Pizza, Pâtes, Desserts, Boissons, puis le reste
+    const rang = c => {
+      const n = (c || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      if (n.startsWith('entree')) return 0;
+      if (n.startsWith('pizza')) return 2;
+      if (n.startsWith('pate')) return 3;
+      if (n.startsWith('plat')) return 1;
+      if (n.startsWith('dessert')) return 4;
+      if (n.startsWith('boisson')) return 5;
+      return 6;
+    };
     const parCategorie = {};
     plats.forEach(p => { const c = p.fields.categorie || 'Plats'; (parCategorie[c] ||= []).push(p.fields); });
 
     zone.innerHTML = Object.keys(parCategorie).sort((a, b) => rang(a) - rang(b)).map(c =>
-      `<h4>${txt(c)}</h4>` + parCategorie[c].map(p => `
+      `<h4>${txt(c)}</h4>` + parCategorie[c].sort((a, b) => (a.nom_plat || '').localeCompare(b.nom_plat || '', 'fr', { sensitivity: 'base' })).map(p => `
         <div class="plat">
           <div><strong>${txt(p.nom_plat)}</strong>${p.description ? `<small>${txt(p.description)}</small>` : ''}</div>
           <span class="prix">${euros(p.prix)}</span>
